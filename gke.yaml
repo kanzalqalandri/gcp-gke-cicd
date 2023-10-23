@@ -1,0 +1,37 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "cicd"
+  namespace: "default"
+  labels:
+    app: "cicd"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "cicd"
+  template:
+    metadata:
+      labels:
+        app: "cicd"
+    spec:
+      containers:
+      - name: "py-image"
+        image: "us-east4-docker.pkg.dev/last-project-ok/cicd-gke/my-image:v1.0"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cicd
+  labels:
+    app: cicd
+  namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: cicd
+  type: LoadBalancer

@@ -1,0 +1,27 @@
+steps:
+
+  - name: "gcr.io/cloud-builders/git"
+    args: ["clone", "https://source.developers.google.com/p/last-project-ok/r/cicd-gke"]
+ 
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", ".", "-t", "us-east4-docker.pkg.dev/${_PROJECT_ID}/${_REPO}/${_CINAME}:${_VERSION}"]
+ 
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "us-east4-docker.pkg.dev/${_PROJECT_ID}/${_REPO}/${_CINAME}:${_VERSION}"]
+
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    args:
+    - run
+    - --filename=gke.yaml
+    - --image=us-east4-docker.pkg.dev/${_PROJECT_ID}/${_REPO}/${_CINAME}:${_VERSION}
+    - --location=us-east4
+    - --cluster=cicd-cluster
+    - --namespace=default
+
+
+
+substitutions:
+  _PROJECT_ID : last-project-ok
+  _REPO : cicd-gke
+  _CINAME : my-image
+  _VERSION : v1.0
